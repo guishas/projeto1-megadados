@@ -1,7 +1,7 @@
 from typing import List
 import uuid
-from fastapi import FastAPI, Query
-from models import Produto
+from fastapi import FastAPI, Path
+from models import Produto, ProdutoPost
 
 description = """
 API desenvolvida para o projeto da disciplina de Megadados do Insper
@@ -43,7 +43,7 @@ def get_products():
     return banco
 
 @app.get("/produtos/{product_id}", tags=["Produtos"], summary="Chamada que devolve um produto específico do inventário", response_model=Produto)
-def get_product_by_id(product_id: str = Query(default=..., description="Id do Produto")):
+def get_product_by_id(product_id: str = Path(default=..., description="Id do Produto")):
     for produto in banco:
       if str(produto["product_id"]) == product_id:
           return produto
@@ -51,12 +51,18 @@ def get_product_by_id(product_id: str = Query(default=..., description="Id do Pr
     return {"erro": "produto não existe na base de dados"}
 
 @app.post("/produtos", tags=["Produtos"], summary="Chamada para adicionar um produto ao inventário", response_model=Produto)
-def create_product(produto: Produto):
+def create_product(produto_post: ProdutoPost):
+    produto = Produto()
     produto.product_id = uuid.uuid4()
+    produto.name = produto_post.name
+    produto.description = produto_post.description
+    produto.price = produto_post.price
+    produto.amount = produto_post.amount
+ 
     banco.append(produto.dict())
     return produto.dict()
 
-@app.put("/produtos", tags=["Produtos"], summary="Chamada para alterar um produto do inventário")
+@app.put("/produtos", tags=["Produtos"], summary="Chamada para alterar um produto do inventário", response_model=Produto)
 def update_produto(produto: Produto):
   prod = None
   print(produto)
@@ -75,7 +81,7 @@ def update_produto(produto: Produto):
   return prod.dict()
 
 @app.delete("/produtos/{product_id}", tags=["Produtos"], summary="Chamada para deletar um produto do inventário")
-def delete_produto(product_id: str = Query(default=..., description="Id do Produto")):
+def delete_produto(product_id: str = Path(default=..., description="Id do Produto")):
   for produto in banco:
     if str(produto["product_id"]) == product_id:
       banco.remove(produto)
