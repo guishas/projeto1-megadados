@@ -3,15 +3,61 @@ import uuid
 from fastapi import FastAPI
 from models import Produto
 
-app = FastAPI()
+description = """
+API desenvolvida para o projeto da disciplina de Megadados do Insper
+
+## Desenvolvedores
+
+* Guilherme Lunetta
+
+* José Rafael Fernandes
+
+## Funcionalidades
+
+Ao utilizar essa API você pode:
+
+* **Criar produtos**
+* **Consultar o inventário de produtos**
+* **Consultar um produto específico**
+* **Alterar detalhes dos produtos**
+* **Remover um produto específico**
+
+"""
+
+tags_metadata = [
+    {
+        "name": "Produtos",
+    }
+]
+
+app = FastAPI(title="API - MEGADADOS",
+    description=description,
+    openapi_tags = tags_metadata
+)
 
 banco: List[Produto] = []
 
-@app.get("/produtos")
+@app.get("/produtos", tags=["Produtos"], summary="Summary", description=
+  """
+  Description
+
+  - XXXXXXX
+  - XXXXXXX
+  - XXXXXXX   
+  """
+)
 def get_products():
     return banco
 
-@app.get("/produtos/{product_id}")
+@app.get("/produtos/{product_id}", tags=["Produtos"], summary="Summary", description=
+  """
+  Description
+
+  - XXXXXXX
+  - XXXXXXX
+  - XXXXXXX   
+  """
+)
 def get_product_by_id(product_id: str):
     for produto in banco:
       if str(produto["product_id"]) == product_id:
@@ -19,13 +65,21 @@ def get_product_by_id(product_id: str):
 
     return {"erro": "produto não existe na base de dados"}
 
-@app.post("/produtos")
+@app.post("/produtos", tags=["Produtos"], summary="Summary")
 def create_product(produto: Produto):
     produto.product_id = uuid.uuid4()
     banco.append(produto.dict())
     return produto.dict()
 
-@app.put("/produtos")
+@app.put("/produtos", tags=["Produtos"], summary="Summary", description=
+  """
+  Description
+
+  - XXXXXXX
+  - XXXXXXX
+  - XXXXXXX   
+  """
+)
 def update_produto(produto: Produto):
   prod = None
   print(produto)
@@ -42,7 +96,15 @@ def update_produto(produto: Produto):
 
   return prod.dict()
 
-@app.delete("/produtos/{product_id}")
+@app.delete("/produtos/{product_id}", tags=["Produtos"], summary="Summary", description=
+  """
+  Description
+
+  - XXXXXXX
+  - XXXXXXX
+  - XXXXXXX   
+  """
+)
 def delete_produto(product_id: str):
   for produto in banco:
     if str(produto["product_id"]) == product_id:
