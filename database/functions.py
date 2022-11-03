@@ -34,10 +34,32 @@ def update_product(db: Session, product: schemas.Produto):
   })
 
   db.commit()
-  
-  return {"message": "produto atualizado com sucesso"}
+  return product
 
 def delete_product(db: Session, product_id: str):
   db.query(models.Produto).filter(models.Produto.product_id == product_id).delete()
   db.commit()  
   return {"message": "produto removido com sucesso"}
+
+def create_movimentacao(db: Session, movimentacao: schemas.Movimentacao):
+  db_movimentacao = models.Movimentacao(
+    movimentacao_id = movimentacao.movimentacao_id,
+    product_id = movimentacao.product_id,
+    amount = movimentacao.amount,
+    operation = movimentacao.operation
+  )
+
+  db.add(db_movimentacao)
+  db.commit()
+  db.refresh(db_movimentacao)
+  return db_movimentacao
+
+def get_movimentacao(db: Session):
+  return db.query(models.Movimentacao).all()
+
+def get_movimentacao_by_id(db: Session, movimentacao_id: str):
+  return db.query(models.Movimentacao).filter(models.Movimentacao.movimentacao_id == movimentacao_id).first()
+
+def get_movimentacao_by_product_id(db: Session, product_id: str):
+  print("functions")
+  return db.query(models.Movimentacao).filter(models.Movimentacao.product_id == product_id).all()

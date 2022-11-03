@@ -10,3 +10,11 @@ class Produto(Base):
   description = Column(String(255))
   price = Column(Float)
   amount = Column(Integer)
+
+class Movimentacao(Base):
+  __tablename__ = "movimentacao"
+
+  movimentacao_id = Column(String(255), primary_key=True, index=True)
+  product_id = Column(String(255))
+  amount = Column(Integer)
+  operation = Column(String(255))

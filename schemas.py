@@ -37,3 +37,33 @@ class Produto(ProdutoBase):
   
   class Config:
     orm_mode=True
+
+class MovimentacaoBase(BaseModel):
+  product_id: str = Field(
+    default=""
+  )
+  amount: int = Field(
+    default=0
+  )
+  operation: str = Field(
+    default=""
+  )
+
+class MovimentacaoCreate(MovimentacaoBase):
+  product_id: str = Field(
+    default=""
+  )
+  amount: int = Field(
+    default=0
+  )
+  operation: str = Field(
+    default=""
+  )
+
+class Movimentacao(MovimentacaoBase):
+  movimentacao_id: str = Field(
+    default=""
+  )
+
+  class Config:
+    orm_mode=True

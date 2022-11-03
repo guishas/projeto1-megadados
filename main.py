@@ -1,7 +1,7 @@
 from typing import List
 import uuid
 from fastapi import FastAPI, Path, Depends, HTTPException
-from schemas import Produto, ProdutoCreate
+from schemas import Produto, ProdutoCreate, Movimentacao, MovimentacaoCreate
 from database.database import SessionLocal, engine
 from sqlalchemy.orm import Session
 from database import models, functions
@@ -94,3 +94,59 @@ def delete_produto(product_id: str = Path(default=..., description="Id do Produt
     return delete
   except:
     raise HTTPException(status_code=400, detail="produto não existe na base de dados")
+
+@app.get("/movimentacao")
+def get_movimentacao(db: Session = Depends(get_db)):
+  movimentacoes = functions.get_movimentacao(db)
+  return movimentacoes
+
+@app.get("/movimentacao/{movimentacao_id}")
+def get_movimentacao_by_id(movimentacao_id: str = Path(default=...), db: Session = Depends(get_db)):
+  movimentacao = functions.get_movimentacao_by_id(db=db, movimentacao_id=movimentacao_id)
+  if movimentacao is None:
+    raise HTTPException(status_code=404, detail="movimentação não encontrada")
+  
+  return movimentacao
+
+@app.get("/movimentacao/produto/{product_id}")
+def get_movimentacao_by_product_id(product_id: str = Path(default=...), db: Session = Depends(get_db)):
+  movimentacao = functions.get_movimentacao_by_product_id(db=db, product_id=product_id)
+  if movimentacao is None:
+    raise HTTPException(status_code=404, detail="movimentação não encontrada")
+  
+  return movimentacao
+
+@app.post("/movimentacao")
+def create_movimentacao(movimentacao_post: MovimentacaoCreate, db: Session = Depends(get_db)):
+  movi = Movimentacao()
+  movi.movimentacao_id = uuid.uuid4()
+  movi.product_id = movimentacao_post.product_id
+  movi.amount = movimentacao_post.amount
+  movi.operation = movimentacao_post.operation
+
+  prod = functions.get_product_by_id(db=db, product_id=movimentacao_post.product_id)
+  produto = Produto()
+  produto.name = prod.name
+  produto.description = prod.description
+  produto.price = prod.price
+
+  if movimentacao_post.operation == "inserir":
+    print("inserir")
+    new_amount = prod.amount + movimentacao_post.amount
+    produto.amount = new_amount
+    prod = functions.update_product(db=db, product=produto)
+    print(prod.amount)
+  elif movimentacao_post.operation == "retirar":
+    print("retirar")
+    new_amount = prod.amount - movimentacao_post.amount
+    produto.amount = new_amount
+    prod = functions.update_product(db=db, product=produto)
+    print(prod.amount)
+  else:
+    return {"message": "algo deu errado"}
+
+  movimentacao = functions.create_movimentacao(db=db, movimentacao=movi)
+  if movimentacao is None:
+    raise HTTPException(status_code=404, detail="algo deu errado")
+  
+  return movimentacao
