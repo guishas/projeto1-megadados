@@ -126,6 +126,7 @@ def create_movimentacao(movimentacao_post: MovimentacaoCreate, db: Session = Dep
 
   prod = functions.get_product_by_id(db=db, product_id=movimentacao_post.product_id)
   produto = Produto()
+  produto.product_id = prod.product_id
   produto.name = prod.name
   produto.description = prod.description
   produto.price = prod.price

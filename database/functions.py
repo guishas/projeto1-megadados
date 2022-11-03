@@ -26,13 +26,14 @@ def create_product(db: Session, product: schemas.Produto):
   return db_product
 
 def update_product(db: Session, product: schemas.Produto):
+  print(product.amount)
   db.query(models.Produto).filter(models.Produto.product_id == product.product_id).update({
     'name': product.name,
     'description': product.description,
     'price': product.price,
     'amount': product.amount
   })
-
+  print(product.product_id)
   db.commit()
   return product
 
