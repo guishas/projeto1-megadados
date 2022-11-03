@@ -7,7 +7,7 @@ class ProdutoBase(BaseModel):
       default="", title="Nome do Produto", example="Refrigerante de Cola"
   )
   description: str = Field(
-      default="", title="Descrição do produto", example="Lata de 350ml de refrigetante de cola"
+      default="", title="Descrição do produto", example="Lata de 350ml de refrigerante de cola"
   )
   price: float = Field(
       default=0.0, title="Preço do produto", example=4.90
@@ -21,7 +21,7 @@ class ProdutoCreate(ProdutoBase):
       default="", title="Nome do Produto", example="Refrigerante de Cola"
   )
   description: str = Field(
-      default="", title="Descrição do produto", example="Lata de 350ml de refrigetante de cola"
+      default="", title="Descrição do produto", example="Lata de 350ml de refrigerante de cola"
   )
   price: float = Field(
       default=0.0, title="Preço do produto", example=4.90

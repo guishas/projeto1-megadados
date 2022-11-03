@@ -79,29 +79,18 @@ def create_product(produto_post: ProdutoCreate, db: Session = Depends(get_db)):
 
   return prod
 
-# @app.put("/produtos", tags=["Produtos"], summary="Chamada para alterar um produto do inventário", response_model=Produto)
-# def update_produto(produto: Produto):
-#   prod = None
-#   print(produto)
-#   for p in banco:
-#     if str(p["product_id"]) == str(produto.product_id):
-#       prod = produto
+@app.put("/produtos", tags=["Produtos"], summary="Chamada para alterar um produto do inventário", response_model=Produto)
+def update_produto(produto: Produto, db: Session = Depends(get_db)):
+  try:
+    update = functions.update_product(db=db, product=produto)
+    return update
+  except:
+    raise HTTPException(status_code=400, detail="produto não existe na base de dados")
 
-#   if prod == None:
-#     return {"erro": "produto não existe na base de dados"}
-  
-#   prod.name = produto.name
-#   prod.description = produto.description
-#   prod.price = produto.price
-#   prod.amount = produto.amount
-
-#   return prod.dict()
-
-# @app.delete("/produtos/{product_id}", tags=["Produtos"], summary="Chamada para deletar um produto do inventário")
-# def delete_produto(product_id: str = Path(default=..., description="Id do Produto")):
-#   for produto in banco:
-#     if str(produto["product_id"]) == product_id:
-#       banco.remove(produto)
-#       return {"message": "produto removido com sucesso"}
-
-#   return {"erro": "produto não existe na base de dados"}
+@app.delete("/produtos/{product_id}", tags=["Produtos"], summary="Chamada para deletar um produto do inventário")
+def delete_produto(product_id: str = Path(default=..., description="Id do Produto"), db: Session = Depends(get_db)):
+  try:  
+    delete = functions.delete_product(db=db, product_id=product_id)
+    return delete
+  except:
+    raise HTTPException(status_code=400, detail="produto não existe na base de dados")
