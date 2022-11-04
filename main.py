@@ -24,6 +24,8 @@ Ao utilizar essa API você pode:
 * **Consultar um produto específico**
 * **Alterar detalhes dos produtos**
 * **Remover um produto específico**
+* **Criar movimentações do inventário de produtos**
+* **Consultar as movimentações já feitas**
 
 """
 
@@ -48,8 +50,6 @@ def get_db():
     yield db
   finally:
     db.close()
-
-# banco: List[Produto] = []
 
 @app.get("/produtos", tags=["Produtos"], summary="Chamada que devolve a lista de produtos no inventário", response_model=List[Produto])
 def get_products(db: Session = Depends(get_db)):
@@ -95,28 +95,28 @@ def delete_produto(product_id: str = Path(default=..., description="Id do Produt
   except:
     raise HTTPException(status_code=400, detail="produto não existe na base de dados")
 
-@app.get("/movimentacao")
+@app.get("/movimentacao",  tags=["Movimentações"], summary="Chamada que devolve a lista de modificações dos produtos", response_model=Movimentacao)
 def get_movimentacao(db: Session = Depends(get_db)):
   movimentacoes = functions.get_movimentacao(db)
   return movimentacoes
 
-@app.get("/movimentacao/{movimentacao_id}")
-def get_movimentacao_by_id(movimentacao_id: str = Path(default=...), db: Session = Depends(get_db)):
+@app.get("/movimentacao/{movimentacao_id}",  tags=["Movimentações"], summary="Chamada que devolve uma modificação específica", response_model=Movimentacao)
+def get_movimentacao_by_id(movimentacao_id: str = Path(default=..., description="Id da movimentação"), db: Session = Depends(get_db)):
   movimentacao = functions.get_movimentacao_by_id(db=db, movimentacao_id=movimentacao_id)
   if movimentacao is None:
     raise HTTPException(status_code=404, detail="movimentação não encontrada")
   
   return movimentacao
 
-@app.get("/movimentacao/produto/{product_id}")
-def get_movimentacao_by_product_id(product_id: str = Path(default=...), db: Session = Depends(get_db)):
+@app.get("/movimentacao/produto/{product_id}",  tags=["Movimentações"],  summary="Chamada que devolve a lista de modificações de um produto específico", response_model=Movimentacao)
+def get_movimentacao_by_product_id(product_id: str = Path(default=..., description="Id do produto"), db: Session = Depends(get_db)):
   movimentacao = functions.get_movimentacao_by_product_id(db=db, product_id=product_id)
   if movimentacao is None:
     raise HTTPException(status_code=404, detail="movimentação não encontrada")
   
   return movimentacao
 
-@app.post("/movimentacao")
+@app.post("/movimentacao",  tags=["Movimentações"], summary="Chamada para adicionar uma movimentação a lista de movimentações", response_model=Movimentacao)
 def create_movimentacao(movimentacao_post: MovimentacaoCreate, db: Session = Depends(get_db)):
   movi = Movimentacao()
   movi.movimentacao_id = uuid.uuid4()
