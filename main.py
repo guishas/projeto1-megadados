@@ -132,19 +132,15 @@ def create_movimentacao(movimentacao_post: MovimentacaoCreate, db: Session = Dep
   produto.price = prod.price
 
   if movimentacao_post.operation == "inserir":
-    print("inserir")
     new_amount = prod.amount + movimentacao_post.amount
     produto.amount = new_amount
     prod = functions.update_product(db=db, product=produto)
-    print(prod.amount)
   elif movimentacao_post.operation == "retirar":
-    print("retirar")
     new_amount = prod.amount - movimentacao_post.amount
     produto.amount = new_amount
     prod = functions.update_product(db=db, product=produto)
-    print(prod.amount)
   else:
-    return {"message": "algo deu errado"}
+    raise HTTPException(status_code=404, detail="operação inválida, utilize as operações 'retirar' ou 'inserir'")
 
   movimentacao = functions.create_movimentacao(db=db, movimentacao=movi)
   if movimentacao is None:
